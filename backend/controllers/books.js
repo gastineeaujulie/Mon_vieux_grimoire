@@ -34,3 +34,5 @@ exports.getOneBook = (req, res, next) => {
     .then((book) => res.status(200).json(book))
     .catch((error) => res.status(400).json({ error }));
 };
+
+exports.topRatingBook = (req, res, next) => {};
