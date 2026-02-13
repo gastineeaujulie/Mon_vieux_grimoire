@@ -1,20 +1,23 @@
-const multer = require('multer');
+const multer = require('multer'); // importe middelware multer qui gère les fichiers uploadés (multipart/form-data)
 
 const MIME_TYPES = {
   'image/jpg': 'jpg',
   'image/jpeg': 'jpg',
   'image/png': 'png',
-};
+}; // formats autorisés
 
-const storage = multer.diskStorage({
-  destination: (req, fil, callback) => {
-    callback(null, 'images');
-  },
-  filename: (req, file, callback) => {
-    const name = file.originalname.split(' ').join('_');
-    const extension = MIME_TYPES[file.mimetype];
-    callback(null, name + Date.now() + '.' + extension);
+const storage = multer.memoryStorage(); // stockage em mémoire(RAM) pour Sharp
+
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 2 * 1024 * 1024 }, // max 2MB
+  fileFilter: (req, file, callback) => {
+    if (MIME_TYPES[file.mimetype]) {
+      callback(null, true);
+    } else {
+      callback(new Error('Format non supporté. Utilisez JPG ou PNG.'));
+    }
   },
 });
 
-module.exports = multer({ storage }).single('image');
+module.exports = upload.single('image');

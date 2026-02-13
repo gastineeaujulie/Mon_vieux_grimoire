@@ -1,8 +1,8 @@
-const express = require('express');
-const cors = require('cors');
+const express = require('express'); //pour parserle JSON
+const cors = require('cors'); //pour autoriser les requêtes cross-origin
 const mongoose = require('mongoose');
-const dotenv = require('dotenv');
-const path = require('path');
+const dotenv = require('dotenv'); // variables environnement
+const path = require('path'); // pour les images
 
 const booksRoutes = require('./routes/books');
 const userRoutes = require('./routes/user');
