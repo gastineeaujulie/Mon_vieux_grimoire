@@ -4,6 +4,7 @@ const MIME_TYPES = {
   'image/jpg': 'jpg',
   'image/jpeg': 'jpg',
   'image/png': 'png',
+  'image/webp': 'webp',
 }; // formats autorisés
 
 const storage = multer.memoryStorage(); // stockage em mémoire(RAM) pour Sharp

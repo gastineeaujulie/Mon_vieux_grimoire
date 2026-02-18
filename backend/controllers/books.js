@@ -1,13 +1,9 @@
 const path = require('path');
-const sharp = require('sharp');
+const sharp = require('sharp'); //optimiser et covertir les images en WebP
 const fs = require('fs');
 const Book = require('../models/Book');
 
 exports.createBook = async (req, res, next) => {
-  console.log('Corps de la requête (req.body):', req.body);
-  console.log('Fichier uploadé (req.file):', req.file);
-  console.log('User authentifié (req.auth):', req.auth);
-
   try {
     // Vérifier que le fichier existe
     if (!req.file) {
@@ -46,47 +42,44 @@ exports.createBook = async (req, res, next) => {
   }
 };
 
-exports.rateBook = (req, res, next) => {
-  console.log('Données reçues du frontend:', req.body);
-  console.log('Rating:', req.body.rating);
-  console.log('User ID du token:', req.auth.userId);
-  console.log('ID du livre:', req.params.id);
+exports.rateBook = async (req, res, next) => {
+  try {
+    const book = await Book.findOne({ _id: req.params.id });
 
-  const ratingObject = {
-    userId: req.auth.userId, // Id du token
-    grade: req.body.rating.grade,
-  };
+    if (!book) {
+      return res.status(404).json({ message: 'Livre non trouvé !' });
+    }
 
-  Book.findOne({ _id: req.params.id })
+    // vérifie si le user a déjà noté le livre
+    const alreadyRated = book.ratings.find(
+      (rating) => rating.userId === req.auth.userId
+    );
 
-    .then((book) => {
-      if (!book) {
-        return res.status(404).json({ message: 'Livre non trouvé !' });
-      }
+    if (alreadyRated) {
+      return res
+        .status(403)
+        .json({ message: 'Vous avez déjà noté ce livre !' });
+    }
 
-      // On vérifie si le user a déjà noté le livre
-      const alreadyRated = book.ratings.find(
-        (rating) => rating.userId === req.auth.userId
-      );
+    const ratingObject = {
+      userId: req.auth.userId, // Id du token
+      grade: req.body.rating,
+    };
 
-      if (alreadyRated) {
-        return res
-          .status(403)
-          .json({ message: 'Vous avez déjà noté ce livre !' });
-      }
+    // On ajoute la note au tableau ratings
+    book.ratings.push(ratingObject);
 
-      // On ajoute la note au tableau ratings
-      book.ratings.push(ratingObject);
+    // On calcul la moyenne de la note du livre (somme en cours + note)
+    const total = book.ratings.reduce((acc, rating) => acc + rating.grade, 0);
+    book.averageRating = total / book.ratings.length;
 
-      // On calcul la moyenne de la note du livre (somme en cours + note)
-      const total = book.ratings.reduce((acc, rating) => acc + rating.grade, 0);
-      book.averageRating = total / book.ratings.length;
+    // On sauvegarde le livre avec la nouvelle note et la moyenne
+    await book.save();
 
-      // On sauvegarde le livre avec la nouvelle note et la moyenne
-      return book.save();
-    })
-    .then(() => res.status(200).json({ message: 'Note ajoutée !' }))
-    .catch((error) => res.status(400).json({ error }));
+    res.status(200).json({ message: 'Note ajoutée !' });
+  } catch (error) {
+    res.status(400).json({ error });
+  }
 };
 
 exports.modifyBook = async (req, res, next) => {
@@ -165,7 +158,7 @@ exports.deleteBook = (req, res, next) => {
       fs.unlink(`images/${filename}`, () => {
         Book.deleteOne({ _id: req.params.id })
           .then(() => res.status(200).json({ message: 'Objet supprimé !' }))
-          .catch((error) => res.status(401).json({ error }));
+          .catch((error) => res.status(500).json({ error }));
       });
     })
     .catch((error) => res.status(500).json({ error }));

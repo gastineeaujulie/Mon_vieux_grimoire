@@ -1,13 +1,13 @@
-const express = require('express'); //pour parserle JSON
+const dotenv = require('dotenv'); // variables environnement
+dotenv.config();
+const express = require('express'); //pour parser le JSON
 const cors = require('cors'); //pour autoriser les requêtes cross-origin
 const mongoose = require('mongoose');
-const dotenv = require('dotenv'); // variables environnement
+
 const path = require('path'); // pour les images
 
 const booksRoutes = require('./routes/books');
 const userRoutes = require('./routes/user');
-
-dotenv.config();
 
 mongoose
   .connect(process.env.MONGODB_URI)
@@ -17,10 +17,14 @@ mongoose
 const app = express();
 
 app.use(express.json());
-app.use(cors());
+app.use(cors({ origin: 'http://localhost:3000' }));
 
 app.use('/api/books', booksRoutes);
 app.use('/api/auth', userRoutes);
 app.use('/images', express.static(path.join(__dirname, 'images')));
+
+app.use((error, req, res, next) => {
+  res.status(500).json({ error: error.message });
+});
 
 module.exports = app;
