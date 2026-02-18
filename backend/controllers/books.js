@@ -4,6 +4,10 @@ const fs = require('fs');
 const Book = require('../models/Book');
 
 exports.createBook = async (req, res, next) => {
+  console.log('Corps de la requête (req.body):', req.body);
+  console.log('Fichier uploadé (req.file):', req.file);
+  console.log('User authentifié (req.auth):', req.auth);
+
   try {
     // Vérifier que le fichier existe
     if (!req.file) {
@@ -43,6 +47,11 @@ exports.createBook = async (req, res, next) => {
 };
 
 exports.rateBook = (req, res, next) => {
+  console.log('Données reçues du frontend:', req.body);
+  console.log('Rating:', req.body.rating);
+  console.log('User ID du token:', req.auth.userId);
+  console.log('ID du livre:', req.params.id);
+
   const ratingObject = {
     userId: req.auth.userId, // Id du token
     grade: req.body.rating.grade,
