@@ -7,8 +7,8 @@ module.exports = (req, res, next) => {
       return res.status(401).json({ message: 'Token manquant' });
     }
 
-    const token = authHeader.split(' ')[1];
-    const decodedToken = jwt.verify(token, 'RANDOM_TOKEN_SECRET');
+    const token = authHeader.split(' ')[1]; // on utilise split pour tout recupérer après l'espace dans le header
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET); // on utilise verify pour decoder le token
     const userId = decodedToken.userId;
     req.auth = {
       userId: userId,

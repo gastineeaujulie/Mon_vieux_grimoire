@@ -16,7 +16,7 @@ const upload = multer({
     if (MIME_TYPES[file.mimetype]) {
       callback(null, true);
     } else {
-      callback(new Error('Format non supporté. Utilisez JPG ou PNG.'));
+      callback(new Error('Format non supporté. Utilisez JPG, PNG ou WebP.'));
     }
   },
 });
