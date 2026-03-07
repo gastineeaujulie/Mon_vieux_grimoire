@@ -11,8 +11,6 @@ Se placer dans le dossier backend `cd backend` puis `npm install` pour installer
 
 
 
-
-
 ## Précision 
 { useNewUrlParser: true, useUnifiedTopology: true } inutiles car activées par défaut dans la version récente de Mongoose
 

@@ -7,7 +7,7 @@ const MIME_TYPES = {
   'image/webp': 'webp',
 }; // formats autorisés
 
-const storage = multer.memoryStorage(); // stockage em mémoire(RAM) pour Sharp
+const storage = multer.memoryStorage(); // stockage en mémoire(RAM) pour Sharp
 
 const upload = multer({
   storage: storage,

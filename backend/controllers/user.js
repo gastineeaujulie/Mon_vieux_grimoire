@@ -15,9 +15,11 @@ exports.signUpUser = async (req, res, next) => {
     res.status(201).json({ message: 'Utilisateur créé !' });
   } catch (error) {
     if (error.code === 11000) {
-      res.status(400).json({ message: 'Email déjà utilisé !' }); // code erreur MongoDB 11000 = doublon
+      return res.status(400).json({ message: 'Email déjà utilisé !' }); // code erreur MongoDB 11000 = doublon
     }
-    return res.status(500).json({ error });
+    return res
+      .status(500)
+      .json({ message: 'Erreur lors de la création du compte' });
   }
 };
 
